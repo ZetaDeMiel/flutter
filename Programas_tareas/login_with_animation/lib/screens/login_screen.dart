@@ -9,16 +9,37 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   bool _obscurePassword = true;
 
   //Cerebro de la logica de las animaciones
-  StateMachineController? controller;
+  StateMachineController? 
+  controller; //El ? sirve para verificar que la variable no sea nulo
   //SMI: State Machine Input
   SMIBool? isChecking; //Activa el modo "Chismoso"
   SMIBool? isHandsUp; //Se tapa los ojos
   SMITrigger? trigSuccess; //Se emociona
   SMITrigger? trigFail; //Se pone sad
+
+  // 1) FocusNode(Nodo donde esta el foco)
+  final emailFocus = FocusNode();
+  final passFocus = FocusNode();
+
+  // 2) Listeners (Oyentes, escuchadores)
+  @override
+  void initState() {
+    super.initState();
+    emailFocus.addListener(() {
+      if (emailFocus.hasFocus) {
+        isHandsUp?.change(false); //Manos abajo en email
+        isChecking?.change(true);
+      } else {
+        isChecking?.change(false);
+      }
+    });
+    passFocus.addListener(() {
+      isHandsUp?.change(passFocus.hasFocus); //Manos arriba en password
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,22 +69,24 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                   //Verificar que inicio bien
                   if(controller == null) return;
-                  artboard.addController(controller!);
+                  artboard.addController(controller!,); // El ! Es para decirle que no es nulo
                   isChecking  = controller!.findSMI('isChecking');
                   isHandsUp   = controller!.findSMI('isHandsUp');
                   trigSuccess = controller!.findSMI('trigSuccess');
                   trigFail    = controller!.findSMI('trigFail');
-                }
+                },
                 ),
               ),
               //Espacio entre el oso y el texto email
               const SizedBox(height: 10),
               //Campo de texto del email
               TextField(
+                // 3) Asignas el focusNode al TextFile
+                focusNode: emailFocus,
                 onChanged:(value) {
                   if (isHandsUp != null){
                     //No tapar los ojos al escribir email
-                    isHandsUp!.change(false);
+                    //isHandsUp!.change(false);
                   }
                   if (isChecking == null) return;
                   //Activa el modo chismoso
@@ -84,10 +107,11 @@ class _LoginScreenState extends State<LoginScreen> {
           
               const SizedBox(height: 10),
                 TextField(
+                  focusNode: passFocus,
                   onChanged:(value) {
                   if (isChecking != null){
-                    //No tapar los ojos al escribir email
-                    isChecking!.change(false);
+                    //Tapar los ojos al escribir email
+                    //isChecking!.change(false);
                   }
                   if (isHandsUp == null) return;
                   //Activa el modo chismoso
@@ -135,9 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadiusGeometry.circular(12)
                   ),
-                  onPressed: (){
-                    //TODO:
-                  },
+                  onPressed: (){},
                   child: Text("Login",
                   style: TextStyle(
                     color: Colors.white)),
@@ -170,5 +192,13 @@ class _LoginScreenState extends State<LoginScreen> {
         )
         )
     );
+  }
+
+  // 4) Liberacion de recursos / limpieza de focos
+  @override
+  void dispose() {
+    emailFocus.dispose();
+    passFocus.dispose();
+    super.dispose();
   }
 }
