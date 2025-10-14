@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rive/rive.dart';
+//3.1 Importar libreria para Timer
+import 'dart:async';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,20 +22,27 @@ class _LoginScreenState extends State<LoginScreen> {
   SMITrigger? trigSuccess; //Se emociona
   SMITrigger? trigFail; //Se pone sad
 
+  //2.1 Variable para el seguimiento de los ojos
+  SMINumber? numLook; //Sigue el movimiento del cursor
+
   // 1) FocusNode(Nodo donde esta el foco)
   final emailFocus = FocusNode();
   final passFocus = FocusNode();
 
-  // 2) Listeners (Oyentes, escuchadores)
+  //3.2 Timer para detener la mirada al dejar de teclear
+  Timer? _typingDebounce;
+
+  // 1.2) Listeners (Oyentes, escuchadores)
   @override
   void initState() {
     super.initState();
     emailFocus.addListener(() {
       if (emailFocus.hasFocus) {
-        isHandsUp?.change(false); //Manos abajo en email
-        isChecking?.change(true);
-      } else {
-        isChecking?.change(false);
+        //Manos abajo en email
+        isHandsUp?.change(false); 
+        //2.2 mirada neutral al enfocar email
+        numLook?.value = 50.0;
+        isHandsUp?.change(false);
       }
     });
     passFocus.addListener(() {
@@ -74,6 +83,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   isHandsUp   = controller!.findSMI('isHandsUp');
                   trigSuccess = controller!.findSMI('trigSuccess');
                   trigFail    = controller!.findSMI('trigFail');
+                  // 2.3 Enlazar variable con la animacion
+                  numLook     = controller!.findSMI('numLook');
                 },
                 ),
               ),
@@ -81,12 +92,27 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 10),
               //Campo de texto del email
               TextField(
-                // 3) Asignas el focusNode al TextFile
-                focusNode: emailFocus,
+                focusNode: emailFocus, //Asigna el focusNode al TextField
                 onChanged:(value) {
                   if (isHandsUp != null){
-                    //No tapar los ojos al escribir email
-                    //isHandsUp!.change(false);
+                    //2.4 Implementando numLook
+                    //"Estoy escribiendo"
+                    isChecking!.change(true);
+
+                    //Ajuste de limites de 0 a 100
+                    // 80 es una medida calibracion
+                    final look = (value.length / 80.0 * 100.0).clamp(0.0, 100.0);
+                    numLook?.value = look;
+
+                    //3.3 Debounce: si vuelve a teclear, reinicia el contador
+                    _typingDebounce?.cancel(); //Cancela cualquier timer existente
+                    _typingDebounce = Timer(const Duration(seconds: 3), () {
+                      if (!mounted) {
+                        return; //Si la pantalla se cierra
+                      }
+                      //Mirada neutra
+                      isChecking?.change(false);
+                    });
                   }
                   if (isChecking == null) return;
                   //Activa el modo chismoso
