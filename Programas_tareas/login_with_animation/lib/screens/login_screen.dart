@@ -85,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else if (!RegExp(r'[A-Z]').hasMatch(pass)) {
       pError = 'Debe tener una mayuscula';
     } else if (!RegExp(r'[a-z]').hasMatch(pass)) {
-      pError = 'Debe tener al menos una minusuclar';
+      pError = 'Debe tener al menos una minuscula';
     } else if (!RegExp(r'\d').hasMatch(pass)) {
       pError = 'Debe incluir un numero';
     } else if (!RegExp(r'[^A-Za-z0-9]').hasMatch(pass)) {
@@ -103,14 +103,14 @@ class _LoginScreenState extends State<LoginScreen> {
     isHandsUp?.change(false);
     numLook?.value = 50.0; // Mirada neutral
 
-    // 5.4 Esperar hasta el siguiente frame completo antes de disparar el triggrt
+    // 5.4 Esperar hasta el siguiente frame completo antes de disparar el trigger
     // Esto garantiza que Rive procese la animacion de bajar lar mano antes del trigger
     await Future<void>.delayed(
       const Duration(milliseconds:600),
     );
     //Se le puso esa contidad porque con el tiempo para la aniamcion de bajar las manos
 
-    // 5,5 Simular tiempo de carga (~1 segudno)
+    // 5.5 Simular tiempo de carga (~1 segundo)
     await Future.delayed (const Duration(seconds: 1));
 
     //4.7 Activar triggers
@@ -197,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     //"Estoy escribiendo"
                     isChecking!.change(true);
 
-                    // 5.8 Validacion dinamica de email mientras se escriba
+                    // 5.7 Validacion dinamica de email mientras se escriba
                     String? eError;
                     if (value.isNotEmpty && !isValidEmail(value)) {
                       eError = 'Email invalido';
@@ -253,14 +253,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: passCtrl,
                   onChanged:(value) {
                   
-                  //5.9 Validacion dinamica de password mientras se escribe
+                  //5.8 Validacion dinamica de password mientras se escribe
                   String? pError;
                   if (value.isNotEmpty && value.length < 8) {
                     pError = 'Debe tener al menos 8 caracteres';
                   } else if (!RegExp(r'[A-Z]').hasMatch(value)) {
                     pError = 'Debe tener una mayuscula';
                   } else if (!RegExp(r'[a-z]').hasMatch(value)) {
-                    pError = 'Debe tener al menos una minusuclar';
+                    pError = 'Debe tener al menos una minuscula';
                   } else if (!RegExp(r'\d').hasMatch(value)) {
                     pError = 'Debe incluir un numero';
                   } else if (!RegExp(r'[^A-Za-z0-9]').hasMatch(value)) {
@@ -275,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   setState(() {
                     passError = pError;
                   });
-                  
+
                   if (isHandsUp == null) return;
                   //Activa el modo chismoso
                   isHandsUp!.change(true);
