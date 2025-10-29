@@ -53,6 +53,7 @@ pubsec.yaml                              # Dependencies and Flutter configuratio
 
 ## 🎥 Demo
 
+![Demo de la aplicación](assets/BearAnimated.gif)
 
 ---
 
